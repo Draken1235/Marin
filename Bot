@@ -1,0 +1,79 @@
+const Discord = require('discord.js');
+const axios = require('axios');
+const client = new Discord.Client();
+
+const prefix = '!'; // Change this to your desired command prefix
+
+// Photo URLs
+const photoURLs = {
+  'photo1': 'https://ibb.co/ZG0N4R7',
+  'photo2': 'https://ibb.co/51jN8vK',
+  'photo3': 'https://ibb.co/LNGbV69',
+  'photo4': 'https://ibb.co/Ns6qG55',
+  'photo5': 'https://ibb.co/mJxdMBn',
+  'photo6': 'https://ibb.co/4FBBknN',
+  'photo7': 'https://ibb.co/xhsP6p7',
+  'photo8': 'https://ibb.co/vZw5W5h',
+  'photo9': 'https://ibb.co/db1XNw0',
+  'photo10': 'https://ibb.co/WyWft3h',
+  'photo11': 'https://ibb.co/3zDC378',
+  'photo12': 'https://ibb.co/yfcj7RS',
+  'photo13': 'https://ibb.co/27hrFB2',
+  'photo14': 'https://ibb.co/Ybym3vs',
+  'photo15': 'https://ibb.co/7RSZqTR'
+};
+
+client.on('message', async message => {
+  if (!message.content.startsWith(prefix) || message.author.bot) return;
+
+  const args = message.content.slice(prefix.length).trim().split(/ +/);
+  const command = args.shift().toLowerCase();
+
+  if (command === 'repeat') {
+    const text = args.join(' ');
+    message.channel.send(text);
+  } else if (command === 'say') {
+    const text = args.join(' ');
+    message.channel.send(text);
+  } else if (command === 'photo') {
+    const photoName = args[0].toLowerCase();
+    const photoURL = photoURLs[photoName];
+    if (photoURL) {
+      // Send the specified photo
+      message.channel.send(photoURL);
+    } else {
+      message.channel.send('Sorry, I couldn\'t find that photo.');
+    }
+  } else if (command === 'search') {
+    const query = 'space ' + args.join(' '); // Append 'space' to the query
+
+    try {
+      const response = await axios.get(`https://api.qwant.com/api/search/images?count=10&q=${encodeURIComponent(query)}`);
+      const images = response.data.data.result.items.map(item => item.media);
+      if (images.length > 0) {
+        const randomIndex = Math.floor(Math.random() * images.length);
+        const imageURL = images[randomIndex];
+        message.channel.send(imageURL);
+      } else {
+        message.channel.send('Sorry, I couldn\'t find any space images for that query.');
+      }
+    } catch (error) {
+      console.error('Error searching for images:', error);
+      message.channel.send('Sorry, an error occurred while searching for space images.');
+    }
+  } else if (command === 'help') {
+    message.channel.send('Hello! I\'m Marin, your friendly Discord bot.\n' +
+                        'Here are some commands you can use:\n' +
+                        '`!repeat <text>`: I\'ll repeat whatever text you give me.\n' +
+                        '`!say <text>`: I\'ll say whatever text you give me.\n' +
+                        '`!photo <number>`: I\'ll send the photo associated with the specified number.\n' +
+                        '`!search <query>`: I\'ll search for space-related images based on your query.\n' +
+                        'Feel free to ask if you need any assistance!');
+  }
+});
+
+client.on('ready', () => {
+  console.log('Marin is now online!');
+});
+
+client.login('MTA4Mzc3MDQxNTIyMDAxOTMxMg.GJfLLt.WoX4Bt0nt1OqjvYsw6PWd4aDFn-Bwnco34NC5o'); 
